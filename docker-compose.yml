@@ -1,0 +1,104 @@
+version: "3.8"
+services:
+  order:
+    build: ./order
+    ports:
+      - 50051:50051
+    environment:
+      - NODE_ENV=production
+      - NODE_VERSION=18.15.0
+      - HTTP_PORT=50051
+      - TYPEORM_CONNECTION=postgres
+      - TYPEORM_DATABASE=orderdb
+      - TYPEORM_USERNAME=postgres
+      - TYPEORM_PASSWORD=postgres
+      - TYPEORM_HOST=postgres-order-db
+      - TYPEORM_PORT=54322
+      - TYPEORM_SYNCHRONIZE=true
+      - TYPEORM_ENTITIES=dist/infrastructure/repositories/entities/**/*.js
+      - TYPEORM_ENTITIES_DIR=dist/infrastructure/repositories/entities
+      - TYPEORM_MIGRATIONS=dist/infrastructure/repositories/migrations/**/*.js
+      - TYPEORM_MIGRATIONS_DIR=dist/infrastructure/repositories/migrations
+      - TYPEORM_MAX_QUERY_EXECUTION_TIME= 500
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - orderdb-data:/var/lib/postgresql/data
+    depends_on:
+      - orderdb
+      - redis
+
+  voucher:
+    build: ./voucher
+    ports:
+      - 50052:50052
+    environment:
+      - NODE_ENV=production
+      - NODE_VERSION=18.15.0
+      - HTTP_PORT=50052
+      - TYPEORM_CONNECTION=postgres
+      - TYPEORM_DATABASE=voucherdb
+      - TYPEORM_USERNAME=postgres
+      - TYPEORM_PASSWORD=postgres
+      - TYPEORM_HOST=postgres-voucher-db
+      - TYPEORM_PORT=54321
+      - TYPEORM_SYNCHRONIZE=true
+      - TYPEORM_ENTITIES=dist/infrastructure/repositories/entities/**/*.js
+      - TYPEORM_ENTITIES_DIR=dist/infrastructure/repositories/entities
+      - TYPEORM_MIGRATIONS=dist/infrastructure/repositories/migrations/**/*.js
+      - TYPEORM_MIGRATIONS_DIR=dist/infrastructure/repositories/migrations
+      - TYPEORM_MAX_QUERY_EXECUTION_TIME= 500
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - voucherdb-data:/var/lib/postgresql/data
+    depends_on:
+      - voucherdb
+      - redis
+
+  orderdb:
+    image: postgres
+    restart: always
+    hostname: postgres-order-db
+    expose:
+      - "54322"
+    ports:
+      - 54322:54322
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=orderdb
+    volumes:
+      - orderdb-data:/var/lib/postgresql/data
+    command: -p 54322
+
+  voucherdb:
+    image: postgres
+    restart: always
+    hostname: postgres-voucher-db
+    expose:
+      - "54321"
+    ports:
+      - 54321:54321
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=voucherdb
+    volumes:
+      - voucherdb-data:/var/lib/postgresql/data
+    command: -p 54321
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-data:/var/lib/redis/data
+
+volumes:
+  orderdb-data:
+  voucherdb-data:
+  redis-data:
