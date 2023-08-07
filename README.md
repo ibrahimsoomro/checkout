@@ -97,5 +97,12 @@ This will create necessary migration tables in the database. Once everything is 
 - Postgres DB for both services
 - Redis for PubSub
 
+Since this is a demo project, I've tried to keep the architecture as simple as possible. Specially with the PubSub service. Since Redis in not an ideal Pubsub candidate for production level projects due to its persistence strategy. It can be replaced by Kafka or RabbitMQ depending on the Usecase
 
-Since this is a demo project, I've tried to keep the architecture as simple as possible. Specially with the PubSub service. Since Redis in not an ideal Pubsub service for production level projects because of its persistence strategy.
+## What can be improved
+
+- As mentioned above the messaging service can be improved in this overall architecture. To make it scalable we can either setup these services on EC2 instenses on AWS or their alternative on GCP with an auto-scaling policy in place. Alternatively we can use Kubernetes to manage these services.
+- I've created these services with an assumption that are going to be deployed being a process manager like PM2 in case if deployed on EC2 or deployment artifact in Kubernetes that recreates the service pods in case of failure. 
+- For a more production grade application the overall application can be connected with any Error report and Monitoring tool to check the overall health of the services and architectural components.
+
+In the end I would love to know if you have any questions or confusion regarding this demo. Looking forward for the feedback. 
